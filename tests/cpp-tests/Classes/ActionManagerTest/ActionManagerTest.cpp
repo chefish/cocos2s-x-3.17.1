@@ -91,8 +91,9 @@ void CrashTest::onEnter()
                                             FadeOut::create(1.1f),
                                             nullptr)
                     );
-
-    //After 1.5 second, self will be removed.
+//
+//    //After 1.5 second, self will be removed.
+    // CallFunc把 成员方法变为一个函数指针
     child->runAction(Sequence::create(
                                     DelayTime::create(1.4f),
                                     CallFunc::create( CC_CALLBACK_0(CrashTest::removeThis,this)),
@@ -175,8 +176,8 @@ void PauseTest::onEnter()
 
     auto director = Director::getInstance();
     director->getActionManager()->addAction(action, grossini, true);
-
-    schedule( CC_SCHEDULE_SELECTOR(PauseTest::unpause), 3); 
+//    CC_SCHEDULE_SELECTOR也是把成员方法转为函数指针，可以传参数3进去
+    schedule( CC_SCHEDULE_SELECTOR(PauseTest::unpause), 3);
 }
 
 void PauseTest::unpause(float dt)
@@ -184,6 +185,7 @@ void PauseTest::unpause(float dt)
     unschedule( CC_SCHEDULE_SELECTOR(PauseTest::unpause) );
     auto node = getChildByTag( kTagGrossini );
     auto director = Director::getInstance();
+    //会执行node里的所有action
     director->getActionManager()->resumeTarget(node);
 }
 
@@ -206,8 +208,10 @@ void StopActionTest::onEnter()
     l->setPosition(VisibleRect::center().x, VisibleRect::top().y - 75);
 
     auto pMove = MoveBy::create(2, Vec2(200, 0));
+    //多加一个action
+    auto pMove2 = pMove->reverse();
     auto pCallback = CallFunc::create(CC_CALLBACK_0(StopActionTest::stopAction,this));
-    auto pSequence = Sequence::create(pMove, pCallback, nullptr);
+    auto pSequence = Sequence::create(pMove, pCallback,pMove2, nullptr);
     pSequence->setTag(kTagSequence);
 
     auto pChild = Sprite::create(s_pathGrossini);
@@ -220,6 +224,7 @@ void StopActionTest::onEnter()
 void StopActionTest::stopAction()
 {
     auto sprite = getChildByTag(kTagGrossini);
+    //会停止这个序列的运行
     sprite->stopActionByTag(kTagSequence);
 }
 
